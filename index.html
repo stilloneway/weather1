@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Information</title>
+</head>
+<body>
+    <h1>Weather Information</h1>
+    <p>Enter a location to get the current weather:</p>
+    <input type="text" id="locationInput" value="London" />
+    <button id="getWeatherBtn">Get Weather</button>
+    <div id="weatherResult"></div>
+
+    <script>
+        document.getElementById('getWeatherBtn').addEventListener('click', async () => {
+            const location = document.getElementById('locationInput').value;
+            const url = `https://api.weatherstack.com/current?access_key=cab270cb30c210943d2ae8539d0b2c0c&query=${location}`;
+            const options = {
+                method: 'GET'
+            };
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('weatherResult').textContent = 'Error: ' + data.error.info;
+                } else {
+                    const weather = `
+                        <h2>Weather in ${data.location.name}, ${data.location.country}</h2>
+                        <p><strong>Temperature:</strong> ${data.current.temperature}°C</p>
+                        <p><strong>Weather Description:</strong> ${data.current.weather_descriptions.join(', ')}</p>
+                        <p><strong>Wind Speed:</strong> ${data.current.wind_speed} km/h</p>
+                        <p><strong>Humidity:</strong> ${data.current.humidity}%</p>
+                        <p><strong>Pressure:</strong> ${data.current.pressure} hPa</p>
+                        <p><strong>Precipitation:</strong> ${data.current.precip} mm</p>
+                        <p><strong>Visibility:</strong> ${data.current.visibility} km</p>
+                        <p><img src="${data.current.weather_icons[0]}" alt="Weather icon"></p>
+                    `;
+                    document.getElementById('weatherResult').innerHTML = weather;
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('weatherResult').textContent = 'Error fetching weather data.';
+            }
+        });
+    </script>
+</body>
+</html>
